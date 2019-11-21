@@ -1,0 +1,105 @@
+Anatomical pipeline taken from : https://github.com/poldracklab/mriqc/blob/master/mriqc/workflows/anatomical.py
+
+Modified by Pamela specifically for monkeys.
+Parts of code implemented by kilimanjaro2.
+
+Start Node:
+ Inputs Supplied:
+ -> inpNode.infFile
+
+Crop [Pamela]:
+  ->Automatic Crop
+  ->Manual inspection:
+    if Fail:
+    -> semi manual crop
+    
+N4 first instance[Pamela]:
+  -> Modified to run with monkey parameters
+
+Average Pipeline from HCP[Pamela]:
+  -> Run minimal Processing Pipeline from HCP
+
+Skull Stripping [Pamela]: 
+  -> perform manual right now.
+  -> automation in a month.
+  
+N4 second Instance[Pamela]:
+  -> Output:
+     ss.out_file
+     ss.bias_corrected(optional output to be marked)
+     ss.out_mask
+     ss.bias_image [What file is this?]
+     
+Headmask[kilimanjaro2]:
+  -> Input:
+    ss.bias_corrected
+  -> Function:
+    Compulsorily run with BET.
+  -> Output:
+    hm.outFile == headMaskFile
+    
+Normalization[kilimanjaro2]:
+  -> Input:
+    ss.bias_corrected, ss.out_mask
+  -> Output:
+    norm.inverseCompositeTransform = inverseCompositeTransform
+    norm.outReport = normreport
+  
+Airmask[kilimanjaro2]:
+  ->Input:
+    inverseCompositeTransform
+    to_ras.out_file[What file is this in our case?]
+    ss.out_mask
+    headMaskFile
+  ->Output:
+    airMask.air_mask
+    airMask.hat_mask
+    airMask.art_mask
+    airMask.rot_mask
+    
+Segmentation[Pamela?]:
+  ->Input:
+    ss.out_file
+  ->Output:
+    seg.tissue_class_map
+    seg.partial_volume_files
+
+Compute Independent Quality metrics[kilimanjaro2]:
+  ->Input:
+    inpNode.inFile
+    norm.inverseCompositeTransform
+    to_ras.out_file[Line 51]
+    ss.bias_corrected
+    ss.bias_image[Line 31]
+    ss.out_mask
+    airMask.air_mask
+    airMask.hat_mask
+    airMask.art_mask
+    airMask.rot_mask
+    seg.tissue_class_map
+    seg.partial_volume_files
+    hm.outFile
+  ->Output:
+    iqmswf.noisefit
+    iqmswf.out_file
+    
+Report Generation[kilimanjaro2]:
+  ->Input:
+    norm.outReport
+    to_ras.out_file[Line 51]
+    ss.bias_corrected
+    ss.out_mask
+    hm.outFile
+    airMask.air_mask
+    airMask.art_mask
+    airMask.rot_mask
+    seg.tissue_class_map
+    iqmswf.noisefit
+    iqmswf.out_file
+    
+    
+ Output Node:
+      iqmswf.out_file -> JSON
+
+    
+    
