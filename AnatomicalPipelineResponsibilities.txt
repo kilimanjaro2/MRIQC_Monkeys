@@ -7,6 +7,10 @@ Start Node:
  Inputs Supplied:
  -> inpNode.infFile
 
+to_ras:
+ -> Conform Image
+ -> fed as input to "Crop"
+
 Crop [Pamela]:
   ->Automatic Crop
   ->Manual inspection:
@@ -48,7 +52,7 @@ Normalization[kilimanjaro2]:
 Airmask[kilimanjaro2]:
   ->Input:
     inverseCompositeTransform
-    to_ras.out_file[What file is this in our case?]
+    to_ras.out_file
     ss.out_mask
     headMaskFile
   ->Output:
@@ -57,12 +61,16 @@ Airmask[kilimanjaro2]:
     airMask.art_mask
     airMask.rot_mask
     
-Segmentation[Pamela?]:
+Segmentation[kilimanjaro2]:
   ->Input:
     ss.out_file
   ->Output:
     seg.tissue_class_map
     seg.partial_volume_files
+
+Split Image into fifths[Pamela]:
+ ->Input:
+ ->Output:
 
 Compute Independent Quality metrics[kilimanjaro2]:
   ->Input:
